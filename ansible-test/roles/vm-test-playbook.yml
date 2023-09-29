@@ -1,0 +1,5 @@
+name: Test Playbook  
+hosts: all
+remote_user: VR
+roles: 
+  -python
