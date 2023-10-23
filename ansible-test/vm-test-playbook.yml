@@ -1,0 +1,9 @@
+---
+
+- name: Win_ping - ping windows hosts
+  gather_facts: false
+  ignore_errors: true
+  become: false
+  hosts: "{{ target }}"
+  roles:
+    - test
