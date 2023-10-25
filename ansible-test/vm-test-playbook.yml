@@ -2,8 +2,8 @@
 
 - name: Win_ping - ping windows hosts
   gather_facts: false
-  ignore_errors: true
+  ignore_errors: false
   become: false
-  hosts: "{{ target }}"
+  hosts: proteus_pod
   roles:
     - test
