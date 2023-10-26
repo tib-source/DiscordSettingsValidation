@@ -1,27 +1,7 @@
 ---
 
-- hosts: all 
-  gather_facts: False
-  connection: local
-  
-  tasks: 
+- name: ping 
+  win_ping:
+    
 
-    - name: ping 
-      shell: ping -c 1 -w 2 10.10.6.25
-      ignore_errors: true 
 
-    - name: installing packages for python env
-      become: yes
-      apt:
-        name:
-          - python3-pip
-          update_cache: yes
-
-    - name: Creates directory 
-      file:
-        path: ./basic-http-server
-        state: directory
-
-    - name: install apache2
-      become: yes 
-      apt: name=apache2 update_cache=yes state=latest

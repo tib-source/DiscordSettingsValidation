@@ -1,0 +1,4 @@
+---
+- name: test connection 
+  win_ping:
+#example on how you can create you're own roles and tasks to run

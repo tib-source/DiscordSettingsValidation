@@ -6,4 +6,4 @@
   become: false
   hosts: proteus_pod
   roles:
-    - test
+    - test # current tasks that are being run are under the test role. 
