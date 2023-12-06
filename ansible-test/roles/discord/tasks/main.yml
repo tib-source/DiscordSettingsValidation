@@ -24,7 +24,7 @@
 
 - name: Check Attenuation is 0
   vars:
-    krisp: '"attenuation":0'
+    krisp: '"attenuation":0' 
   assert:
     that:
     - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
@@ -32,12 +32,12 @@
   when: file_result.matched > 0
 
 
-# - name: Check Hardware Acceleration is set to false 
-#   changed_when: false
-#   vars:
-#     krisp: '"hardwareH264":true'
-#   assert:
-#       that:
-#       - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
-#       fail_msg: "The string is not present in the file"
-#   when: file_result.matched > 0
+- name: Check Hardware Acceleration is set to false 
+  changed_when: false
+  vars:
+    krisp: '"hardwareH264":true'
+  assert:
+      that:
+      - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+      fail_msg: "The string is not present in the file"
+  when: file_result.matched > 0

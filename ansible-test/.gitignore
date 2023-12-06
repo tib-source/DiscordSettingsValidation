@@ -1,1 +1,5 @@
+# DONT REMOVE -> Sensitive data in this file
 group_vars/immersion_pods.yml
+
+# hosts 
+inventory
