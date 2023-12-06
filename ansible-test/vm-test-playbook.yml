@@ -4,6 +4,6 @@
   gather_facts: false
   ignore_errors: false
   become: false
-  hosts: proteus_pod
+  hosts: immersion_pods
   roles:
     - test # current tasks that are being run are under the test role. 

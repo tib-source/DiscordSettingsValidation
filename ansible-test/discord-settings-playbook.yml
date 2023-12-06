@@ -1,0 +1,8 @@
+---
+
+- name: Discord settings
+  gather_facts: false
+  hosts: immersion_pods
+  roles: 
+    - test
+    - discord

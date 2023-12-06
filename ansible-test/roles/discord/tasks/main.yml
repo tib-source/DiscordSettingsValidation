@@ -1,0 +1,43 @@
+---
+
+- name: Find Log File
+  ansible.windows.win_find: 
+    paths: 'C:\Users\VR\AppData\Roaming\discord\Local Storage\leveldb'
+    use_regex: yes
+    patterns: 
+        - '.*log$'
+  register: file_result
+  
+- name: Read Log file content
+  win_shell: Get-Content "{{ file_result.files[0].path }}"
+  register: file_content
+
+
+- name: Check Noise Suppression is set to Krisp
+  vars:
+    krisp: '"vadUseKrisp":true'
+  assert:
+    that:
+    - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+    fail_msg: "The string is not present in the file"
+  when: file_result.matched > 0
+
+- name: Check Attenuation is 0
+  vars:
+    krisp: '"attenuation":0'
+  assert:
+    that:
+    - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+    fail_msg: "The string is not present in the file"
+  when: file_result.matched > 0
+
+
+# - name: Check Hardware Acceleration is set to false 
+#   changed_when: false
+#   vars:
+#     krisp: '"hardwareH264":true'
+#   assert:
+#       that:
+#       - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+#       fail_msg: "The string is not present in the file"
+#   when: file_result.matched > 0

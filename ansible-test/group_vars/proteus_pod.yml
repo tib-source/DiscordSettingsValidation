@@ -1,9 +1,0 @@
-ansible_port: 5985
-ansible_connection: winrm
-ansible_winrm_transport: ntlm
-ansible_winrm_server_cert_validation: ignore
-
-ansible_user: "VR"
-ansible_password: "DrHoratioSands"
-ansible_become_user: VR
-ansible_become_pass: "DrHoratioSands"
