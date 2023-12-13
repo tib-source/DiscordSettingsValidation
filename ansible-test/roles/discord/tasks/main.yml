@@ -15,19 +15,19 @@
 
 - name: Check Noise Suppression is set to Krisp
   vars:
-    krisp: '"vadUseKrisp":true'
+    setting: '"vadUseKrisp":true'
   assert:
     that:
-    - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+    - "'{{setting}}' in file_content.stdout_lines | join(' ')"
     fail_msg: "The string is not present in the file"
   when: file_result.matched > 0
 
 - name: Check Attenuation is 0
   vars:
-    krisp: '"attenuation":0' 
+    setting: '"attenuation":0' 
   assert:
     that:
-    - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+    - "'{{setting}}' in file_content.stdout_lines | join(' ')"
     fail_msg: "The string is not present in the file"
   when: file_result.matched > 0
 
@@ -35,9 +35,9 @@
 - name: Check Hardware Acceleration is set to false 
   changed_when: false
   vars:
-    krisp: '"hardwareH264":true'
+    setting: '"hardwareH264":true'
   assert:
       that:
-      - "'{{krisp}}' in file_content.stdout_lines | join(' ')"
+      - "'{{setting}}' in file_content.stdout_lines | join(' ')"
       fail_msg: "The string is not present in the file"
   when: file_result.matched > 0
