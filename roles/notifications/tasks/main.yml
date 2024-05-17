@@ -1,5 +1,4 @@
 ---
 - name: Send notification
-  debug:
-    msg: "Sending notification with message: {{ body_message }} and urgency: {{ urgency }}"
+  include_tasks: "./utils/send-zeus-notification.yml"
   # Replace with actual notification task, e.g., sending an email or a message to a monitoring system

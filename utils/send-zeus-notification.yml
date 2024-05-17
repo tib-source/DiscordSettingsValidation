@@ -1,0 +1,32 @@
+---
+- name: Ensure body_message and urgency is defined
+  fail:
+    msg: body_message not provided
+  when: (body_message is undefined) or (urgency is undefined)
+
+- name: Extract host shortname
+  set_fact:
+    short_hostname: "{{ inventory_hostname.split('.')[0] }}"
+
+- name: Prepare POST request body for Hera
+  set_fact:
+    request_body:
+      eventName: createNotification
+      data: 
+          title: Discord Setting Mismatch
+          body: "{{body_message}} on {{short_hostname}}" 
+          urgency: "high"
+          cause: "genericFaultNotification"
+          targets:
+            type: role
+            value: tech-support
+
+- name: Send hera notification on zeus
+  win_uri:
+    url: 'http://localhost:57125'
+    method: POST
+    body: "{{ request_body | to_json }}"
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+

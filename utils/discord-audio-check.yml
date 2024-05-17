@@ -47,13 +47,4 @@
 #   loop_control:
 #     loop_var: check
 
-- name: Show notifications for failed checks
-  include_role:
-    name: notifications
-  vars:
-    body_message: "{{check.check.name}} is set to {{check.check.value}}"
-    urgency: "medium"
-  loop: "{{ discord_checks.results }}"
-  loop_control:
-    loop_var: check
-  when:  check.failed
+
