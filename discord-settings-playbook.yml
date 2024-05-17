@@ -1,54 +1,54 @@
 ---
-- name: Clear old leveldb files 
-  become: true
-  hosts: localhost
-  tasks:
-    - name: Remove all leveldb files 
-      find:
-        path: "{{ playbook_dir }}/files/db_container/"
-        recurse: true
-      register: container
-      ignore_errors: true
+# - name: Clear old leveldb files 
+#   become: true
+#   hosts: localhost
+#   tasks:
+#     - name: Remove all leveldb files 
+#       find:
+#         path: "{{ playbook_dir }}/files/db_container/"
+#         recurse: true
+#       register: container
+#       ignore_errors: true
 
-    - name: Remove all output json files
-      find:
-        path: "{{ playbook_dir }}/files/db_output/"
-      register: output
-      ignore_errors: true
+#     - name: Remove all output json files
+#       find:
+#         path: "{{ playbook_dir }}/files/db_output/"
+#       register: output
+#       ignore_errors: true
 
-    - name: Removing all files previously found in files dir
-      file:
-        path: "{{ item.path }}"
-        state: absent
-      with_items: 
-        - "{{ container.files }}"
-        - "{{ output.files }}"
-      ignore_errors: true   
+#     - name: Removing all files previously found in files dir
+#       file:
+#         path: "{{ item.path }}"
+#         state: absent
+#       with_items: 
+#         - "{{ container.files }}"
+#         - "{{ output.files }}"
+#       ignore_errors: true   
 
-- name: Fetch folder from each pod
-  hosts: immersion_pods
-  gather_facts: true
-  become: true
-  tasks:
-    - name: Close discord
-      win_shell: Stop-Process -Name "discord"
-      ignore_errors: yes
+# - name: Fetch folder from each pod
+#   hosts: immersion_pods
+#   gather_facts: true
+#   become: true
+#   tasks:
+#     - name: Close discord
+#       win_shell: Stop-Process -Name "discord"
+#       ignore_errors: yes
 
-    - name: Execute dir command to find all files
-      win_shell: Get-ChildItem "C:\Users\VR\AppData\Roaming\discord\Local Storage\leveldb" -File | Select-Object -ExpandProperty FullName
-      register: found_files
+#     - name: Execute dir command to find all files
+#       win_shell: Get-ChildItem "C:\Users\VR\AppData\Roaming\discord\Local Storage\leveldb" -File | Select-Object -ExpandProperty FullName
+#       register: found_files
 
-    - name: Copy files
-      fetch: 
-        src: "{{ item }}"
-        dest: "{{ playbook_dir }}/files/db_container/{{ inventory_hostname }}/"
-        flat: yes
-      with_items: "{{ found_files.stdout_lines }}"
+#     - name: Copy files
+#       fetch: 
+#         src: "{{ item }}"
+#         dest: "{{ playbook_dir }}/files/db_container/{{ inventory_hostname }}/"
+#         flat: yes
+#       with_items: "{{ found_files.stdout_lines }}"
 
-    - name: Hard reset
-      include_tasks: ./utils/hera-run-script-from-slug.yml
-      vars:
-        script_slug: restart-discord
+#     - name: Hard reset
+#       include_tasks: ./utils/hera-run-script-from-slug.yml
+#       vars:
+#         script_slug: restart-discord
 
 - name: Discord settings
   become: true
