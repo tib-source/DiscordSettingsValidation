@@ -1,0 +1,25 @@
+---
+# - name: Fetch Discord LevelDB folder
+#   win_copy:
+#     src: "C:\\Users\\VR\\AppData\\Roaming\\discord\\Local Storage\\leveldb"
+#     dest: "{{ playbook_dir }}"
+
+- name: Close discord
+  win_shell: Stop-Process -Name "discord"
+
+- name: Execute dir command to find all files
+  win_shell: Get-ChildItem "C:\Users\VR\AppData\Roaming\discord\Local Storage\leveldb" -File | Select-Object -ExpandProperty FullName
+  register: found_files
+
+- name: Copy files
+  fetch: 
+    src: "{{ item }}"
+    dest: "{{ playbook_dir }}/files/db_container/{{ inventory_hostname }}/"
+    flat: yes
+  loop: "{{ found_files.stdout_lines }}"
+
+
+- name: Restart Discord 
+  include_tasks: ../utils/hera-run-script-from-slug.yml
+  vars: 
+    script_slug: restart-discord

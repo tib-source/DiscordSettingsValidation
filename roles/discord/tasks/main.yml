@@ -1,43 +1,26 @@
 ---
+# Close discord
 
-- name: Find Log File
-  ansible.windows.win_find: 
-    paths: 'C:\Users\VR\AppData\Roaming\discord\Local Storage\leveldb'
-    use_regex: yes
-    patterns: 
-        - '.*log$'
-  register: file_result
-  
-- name: Read Log file content
-  win_shell: Get-Content "{{ file_result.files[0].path }}"
-  register: file_content
+- name: Read and parse existing MediaJson
+  slurp:
+    src: '{{ playbook_dir }}/files/mediaEngine.json'
+  register: discord_json
+  ignore_errors: true
 
 
-- name: Check Noise Suppression is set to Krisp
-  vars:
-    setting: '"vadUseKrisp":true'
-  assert:
-    that:
-    - "'{{setting}}' in file_content.stdout_lines | join(' ')"
-    fail_msg: "The string is not present in the file"
-  when: file_result.matched > 0
-
-- name: Check Attenuation is 0
-  vars:
-    setting: '"attenuation":0' 
-  assert:
-    that:
-    - "'{{setting}}' in file_content.stdout_lines | join(' ')"
-    fail_msg: "The string is not present in the file"
-  when: file_result.matched > 0
+- name: Parse JSON content
+  set_fact:
+    discord_settings: "{{ discord_json['content'] | b64decode | from_json }}"
 
 
-- name: Check Hardware Acceleration is set to false 
-  changed_when: false
-  vars:
-    setting: '"hardwareH264":true'
-  assert:
-      that:
-      - "'{{setting}}' in file_content.stdout_lines | join(' ')"
-      fail_msg: "The string is not present in the file"
-  when: file_result.matched > 0
+- name: Check if conditions are met
+  set_fact:
+    attenuation_is_zero: true
+    automatic_input_sensitivty: true
+    vad_use_krisp_is_true: true
+    hardware_h264_is_false: true
+  when:
+    - parsed_json.default.attenuation == 0
+    - parsed_json.default.modeOptions.vadUseKrisp == true
+    - parsed_json.default.modeOptions.autoThreshold == true
+    - parsed_json.default.hardwareH264 == false

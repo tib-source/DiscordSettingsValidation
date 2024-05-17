@@ -1,0 +1,37 @@
+---
+- name: Ensure pod is defined
+  fail:
+    msg: pod is not defined
+  when: pod is undefined
+
+- name: Read and parse existing MediaJson
+  slurp:
+    src: '{{ playbook_dir }}/files/db_output/{{ pod }}.json'  # Use `pod` variable instead of `{{pod}}`
+  register: discord_json
+  ignore_errors: true
+
+
+- name: Parse JSON content
+  set_fact:
+    discord_settings: "{{ discord_json['content'] | b64decode | from_json }}"
+
+
+- name: Check if conditions are met
+  assert:
+    that:
+      - check.value == check.condition 
+    fail_msg: "{{pod}}: {{check.name}} is set to: {{ check.value }}, expected: {{check.condition}}"
+    success_msg: "{{pod}}: {{check.name}} is set to: {{ check.value }}"
+
+  loop:
+    - {  name: 'attenuation', condition: '0', value: '{{discord_settings.default.attenuation}}'  }
+    - {  name: 'vadUseKrisp', condition: true, value: '{{discord_settings.default.modeOptions.vadUseKrisp}}' }
+    - {  name: 'autoThreshold', condition: true, value: '{{discord_settings.default.modeOptions.autoThreshold}}' }
+    # - { name: 'openH264',  condition: true, value: '{{discord_settings.default.openH264}}' }
+    - {  name: 'noiseCancellation', condition: true, value: '{{discord_settings.default.noiseCancellation}}' }
+  loop_control:
+    loop_var: check
+  register:
+    discord_checks
+  ignore_errors: yes
+

@@ -1,0 +1,19 @@
+---
+- name: Ensure script_slug is defined
+  fail:
+    msg: script_slug not provided
+  when: script_slug is undefined
+
+- name: Prepare POST request body for Hera
+  set_fact:
+    request_body:
+      eventName: scriptRunFromSlug
+      data:
+        slug: "{{ script_slug }}"
+
+- name: Run Hera script with slug "{{ script_slug }}"
+  ansible.windows.win_uri:
+    url: http://localhost:57125
+    method: POST
+    body: "{{ request_body | to_json }}"
+    content_type: application/json

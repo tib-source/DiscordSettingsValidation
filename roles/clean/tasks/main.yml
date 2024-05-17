@@ -1,0 +1,13 @@
+---
+- name: Locating all files in leveldb dir
+  find:
+    path: "{{ playbook_dir }}/files/leveldb/"
+  register: cleanup
+  ignore_errors: true
+
+- name: Removing all files previously found in files dir
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ cleanup.files }}"
+  ignore_errors: true

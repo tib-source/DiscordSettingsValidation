@@ -3,3 +3,13 @@ group_vars/immersion_pods.yml
 
 # hosts 
 inventory/hosts.ini
+
+
+# exclude everything
+files/db_container/*
+!files/db_container/.gitkeep 
+
+
+# exclude everything
+files/db_output/*
+!files/db_output/.gitkeep 

@@ -1,0 +1,6 @@
+---
+
+- name: Upgrade your_package_name via Chocolatey
+  win_chocolatey:
+    name: powertoys
+    state: latest

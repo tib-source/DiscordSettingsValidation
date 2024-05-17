@@ -1,0 +1,117 @@
+---
+# # Closes steam vr successfully   
+# - name: Close Steam VR 
+#   win_shell: Stop-Process -Name "vrmonitor" 
+#   ignore_errors: true
+
+# # Undocks steam vr view  
+# - name: Modify mirrorViewDisplayMode setting
+#   vars:
+#     settings: '"mirrorViewDisplayMode" : "2"'
+#   win_lineinfile:
+#     path: 'C:\Program Files (x86)\Steam\config\steamvr.vrsettings'
+#     regexp: '("mirrorViewDisplayMode"\s*:\s*\d)'
+#     line: '"mirrorViewDisplayMode": 2,'
+#     insertafter: '"steamvr" : {'
+
+# # Sets steam vr view to be full screen
+# - name: Modify settings_desktop setting
+#   vars:
+#     settings: '"settings_desktop" : "40,155,800,600,0"'
+#   win_lineinfile:
+#     path: 'C:\Program Files (x86)\Steam\config\steamvr.vrsettings'
+#     regexp: '"settings_desktop" : "[^"]+"'
+#     line: '"settings_desktop" : "40,155,800,600,0"'
+
+
+
+# # This seems to close steam for some reason ??? quite confused why it does this
+# - name: Launch SteamVR
+#   win_shell: '"C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\bin\\win64\\vrmonitor.exe"'
+#   args:
+#     chdir: "C:\\Program Files (x86)\\Steam\\steamapps\\common\\SteamVR\\bin\\win64"
+
+
+# # Set up obs with custom profile and settings - possibly use customer name as file save name :)  
+# # Launch obs with -startrecording option 
+# # Minimize obs 
+# - name: Get the path to the JSON file containing new settings
+#   set_fact:
+#     new_settings_file: "{{ playbook_dir }}/obs_settings.json"
+
+# # Copying over the settings file works
+# - name: Write new settings to OBS settings file
+#   win_copy:
+#     src: "{{ new_settings_file }}"
+#     dest: "{{ obs_settings_file }}"
+#     force: yes
+
+
+# - name: Open OBS 
+#   win_shell: Start-Process -FilePath "C:\Program Files\obs-studio\bin\64bit\obs64.exe" --startrecording
+
+
+- name: Stop SteamVR
+  include_tasks: ../../utils/hera-run-script-from-slug.yml
+  vars:
+    script_slug: stop-steam-vr
+
+- name: Set desired SteamVR Display Mode
+  set_fact:
+    steamvr_display_mode: 
+      steamvr:
+        mirrorViewDisplayMode: 2
+      DesktopUI: 
+        settings_desktop: "40,155,800,600,0"
+
+- name: Read and parse existing steamvr.vrsettings file
+  slurp:
+    src: "C:/Program Files (x86)/Steam/config/steamvr.vrsettings"
+  register: steamvr_settings
+  ignore_errors: true
+
+- name: Merge current wth desires steamvr_display_mode
+  set_fact:
+    new_steamvr_settings: "{{ (steamvr_settings['content'] | b64decode | from_json | default({})) | combine(steamvr_display_mode, recursive=True) }}"
+
+- name: Save updated SteamVR settings
+  win_copy:
+    content: "{{ new_steamvr_settings | to_nice_json(indent=2) }}"
+    dest: "C:/Program Files (x86)/Steam/config/steamvr.vrsettings"
+
+- name: Perform hard reset 
+  include_tasks: ../../utils/hera-run-script-from-slug.yml
+  vars:
+    script_slug: kill-everything
+
+- name: Copy desired OBS configuration file from Ansible
+  win_copy:
+    src: '{{ playbook_dir }}/obs_settings.json'
+    dest: "C:\\Users\\VR\\AppData\\Roaming\\obs-studio\\basic\\scenes\\Untitled.json"
+    force: yes
+
+- name: Pause for 25 seconds - Let hardreset open everything back up
+  ansible.builtin.pause:
+    seconds: 25 
+
+- name: Start OBS
+  include_tasks: ../../utils/hera-run-script-from-slug.yml
+  vars:
+    script_slug: start-recording
+
+
+
+# Set steam vr back to normal
+#----------------------------------------
+
+# - name: Set desired SteamVR Display Mode
+#   set_fact:
+#     steamvr_display_mode: 
+#       steamvr:
+#         mirrorViewDisplayMode: 0
+
+
+# - name: Restart SteamVR
+#   include_tasks: ../utils/hera-run-script-from-slug.yml
+#   vars:
+#     script_slug: restart-steam-vr

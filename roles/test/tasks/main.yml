@@ -1,4 +1,18 @@
 ---
-- name: test connection 
-  win_ping:
-#example on how you can create your own roles and tasks to run
+- name: Run levelDb extraction script
+  shell: '{{playbook_dir}}/scripts/ldb.py --file-path {{ playbook_dir }}/files/leveldb --name {{item}}'
+  with_items: "{{ groups['immersion_pods'] }}"
+  loop_control:
+    loop_var: item
+
+- name: Check discord files
+  include_tasks: ../../utils/discord-audio-check.yml
+  loop_control:
+    loop_var: item
+
+- name: Restart Discord 
+  include_tasks: ../utils/hera-run-script-from-slug.yml
+  vars: 
+    script_slug: restart-discord
+  loop_control:
+    loop_var: item
