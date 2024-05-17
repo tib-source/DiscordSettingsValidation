@@ -9,6 +9,6 @@ Ansible then checks each of these output json files against a whatever critera i
 ## Playbook Structure
 The playbook is divided into three main sections:
 
-- Clear Old LevelDB Files: Removes outdated LevelDB and JSON files from designated directories.
+- Clear Old LevelDB Files: Removes outdated LevelDB and JSON files from `files/db_container` and `files/db_output`.
 - Fetch Folders from Each Pod: Gathers specific folders from each immersion pod, closes Discord processes, and copies necessary files.
 - Configure Discord Settings: Executes scripts to manage LevelDB extraction and perform audio checks on Discord files.
